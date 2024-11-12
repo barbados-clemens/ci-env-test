@@ -3,6 +3,10 @@ name: Called
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      nx-ci-execution-id:
+        required: true
+        type: string
 
 permissions:
   actions: read
@@ -10,7 +14,7 @@ permissions:
   pull-requests: write
 
 env:
-  NX_CI_EXECUTUTION_ID: ${{ github.sha }}-${{ github.run_attempt }}
+  NX_CI_EXECUTUTION_ID: ${{ inputs.nx-ci-execution-id }}
 
 jobs:
   main:

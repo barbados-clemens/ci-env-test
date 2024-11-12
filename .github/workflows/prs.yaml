@@ -24,6 +24,8 @@ jobs:
   pre-workflow:
     name: Pre Workflow
     uses: ./.github/workflows/pre-workflow.yaml
+    with:
+      nx-ci-execution-id: ${{ env.NX_CI_EXECUTION_ID }}
     secrets: inherit
 
   main:
