@@ -13,11 +13,10 @@ permissions:
   contents: read
   pull-requests: write
 
-env:
-  NX_CI_EXECUTUTION_ID: ${{ inputs.nx-ci-execution-id }}
-
 jobs:
   main:
+    env:
+      NX_CI_EXECUTUTION_ID: ${{ inputs.nx-ci-execution-id }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +24,9 @@ jobs:
           fetch-depth: 0
 
       - name: Print environment variables
-        run: echo "NX_CI_EXECUTION_ID=${NX_CI_EXECUTION_ID}"
+        run: |
+          echo "NX_CI_EXECUTION_ID=$NX_CI_EXECUTION_ID"
+          echo "Input: ${{ inputs.nx-ci-execution-id }}"
 
       - uses: pnpm/action-setup@v4
         with:
