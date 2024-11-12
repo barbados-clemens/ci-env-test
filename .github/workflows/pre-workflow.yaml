@@ -21,8 +21,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: echo "NX_CI_EXECUTION_ID=${{inputs.nx-ci-execution-id}}" >> $GITHUB_ENV
-
       - name: Print environment variables
         run: |
           echo "NX_CI_EXECUTION_ID=$NX_CI_EXECUTION_ID"
