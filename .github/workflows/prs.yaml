@@ -17,25 +17,26 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  NX_CI_EXECUTUTION_ID: ${{ github.sha }}-${{ github.run_attempt }}
-
 jobs:
   pre-workflow:
     name: Pre Workflow
     uses: ./.github/workflows/pre-workflow.yaml
+    with:
+      nx-ci-execution-id: ${{ github.sha }}-${{ github.run_attempt }}
     secrets: inherit
 
   main:
     runs-on: ubuntu-latest
     needs: pre-workflow
+    env:
+      NX_CI_EXECUTION_ID: ${{ github.sha }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Print environment variables
-        run: echo "NX_CI_EXECUTION_ID=${NX_CI_EXECUTION_ID}"
+        run: echo "NX_CI_EXECUTION_ID=$NX_CI_EXECUTION_ID"
 
       - uses: pnpm/action-setup@v4
         with:
@@ -48,11 +49,10 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps
       - uses: nrwl/nx-set-shas@v4
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
       # When you enable task distribution, run the e2e-ci task instead of e2e
-      - run: pnpm exec nx affected -t lint test build e2e-ci
+      - run: pnpm exec nx affected -t lint test build

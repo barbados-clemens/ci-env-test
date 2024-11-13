@@ -3,18 +3,15 @@ name: Called
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      nx-ci-execution-id:
+        required: true
+        type: string
 
 permissions:
   actions: read
   contents: read
   pull-requests: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
-env:
-  NX_CI_EXECUTUTION_ID: ${{ github.sha }}-${{ github.run_attempt }}
 
 jobs:
   main:
@@ -24,8 +21,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - run: echo "NX_CI_EXECUTION_ID=${{ inputs.nx-ci-execution-id }}" >> $GITHUB_ENV
+
       - name: Print environment variables
-        run: echo "NX_CI_EXECUTION_ID=${NX_CI_EXECUTION_ID}"
+        run: |
+          echo "NX_CI_EXECUTION_ID=$NX_CI_EXECUTION_ID"
+          echo "Input: ${{ inputs.nx-ci-execution-id }}"
 
       - uses: pnpm/action-setup@v4
         with:
@@ -38,7 +39,6 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps
       - uses: nrwl/nx-set-shas@v4
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
